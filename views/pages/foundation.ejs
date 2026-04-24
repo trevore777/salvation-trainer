@@ -1,0 +1,38 @@
+<section class="panel">
+  <p class="eyebrow">Required Module</p>
+  <h1><%= foundation.title %></h1>
+  <p class="lead"><%= foundation.bigIdea %></p>
+  <blockquote><%= foundation.keyLine %></blockquote>
+</section>
+
+<section class="panel">
+  <h2>Core Scriptures</h2>
+  <% foundation.scriptures.forEach(s => { %>
+    <div class="scripture">
+      <strong><%= s.ref %></strong>
+      <p><%= s.text %></p>
+    </div>
+  <% }) %>
+</section>
+
+<section class="panel">
+  <h2>Evidence and Reasoned Support</h2>
+  <% foundation.evidence.forEach(e => { %>
+    <article class="mini-card">
+      <h3><%= e.heading %></h3>
+      <p><%= e.body %></p>
+      <p class="refs">Refs: <%= e.refs.join(", ") %></p>
+    </article>
+  <% }) %>
+</section>
+
+<section class="panel">
+  <h2>Workbook Tasks</h2>
+  <% foundation.workbook.forEach((q, idx) => { %>
+    <label class="workbook">
+      <span><%= idx + 1 %>. <%= q %></span>
+      <textarea data-save="foundation-q<%= idx %>" placeholder="Write your answer here..."></textarea>
+    </label>
+  <% }) %>
+  <button class="btn primary" onclick="completeModule('foundation')">Mark Foundation Complete</button>
+</section>

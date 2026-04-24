@@ -1,0 +1,120 @@
+<!-- HEADER -->
+<section class="panel">
+  <p class="eyebrow">Lesson <%= lesson.id %></p>
+  <h1><%= lesson.title %></h1>
+  <p class="lead"><%= lesson.bigIdea %></p>
+</section>
+
+<!-- VIDEO -->
+<section class="panel">
+  <h2>🎥 Video Lesson</h2>
+  <video controls width="100%" preload="metadata" style="border-radius:16px; margin:16px 0;">
+    <source src="<%= lesson.videoPlaceholder %>" type="video/mp4">
+    Your browser does not support the video tag.
+  </video>
+  <p><code><%= lesson.videoPlaceholder %></code></p>
+</section>
+
+<!-- APP-NATIVE SLIDE VIEWER -->
+<section class="panel">
+  <h2>📑 Lesson Slides</h2>
+  <p class="lead">Use Previous / Next or keyboard arrows. These slides are built into the app, so you do not need the PowerPoint PDF iframe.</p>
+
+  <div class="slide-viewer" data-slide-viewer data-lesson-id="<%= lesson.id %>">
+    <div class="slide-stage">
+      <% lesson.slides.forEach((slide, idx) => { %>
+        <article class="teaching-slide <%= idx === 0 ? 'active' : '' %>" data-slide="<%= idx %>">
+          <p class="eyebrow">Slide <%= idx + 1 %> of <%= lesson.slides.length %></p>
+          <h3><%= slide.heading %></h3>
+
+          <% if (slide.subheading) { %>
+            <p class="slide-subheading"><%= slide.subheading %></p>
+          <% } %>
+
+          <% if (slide.scriptureRef) { %>
+            <div class="scripture slide-scripture">
+              <strong><%= slide.scriptureRef %></strong>
+              <% if (slide.scriptureText) { %>
+                <p><%= slide.scriptureText %></p>
+              <% } %>
+            </div>
+          <% } %>
+
+          <% if (slide.body) { %>
+            <p class="slide-body"><%= slide.body %></p>
+          <% } %>
+
+          <% if (slide.points && slide.points.length) { %>
+            <ul class="slide-points">
+              <% slide.points.forEach(point => { %>
+                <li><%= point %></li>
+              <% }) %>
+            </ul>
+          <% } %>
+
+          <% if (slide.objections && slide.objections.length) { %>
+            <div class="objection-list">
+              <% slide.objections.forEach(obj => { %>
+                <div class="objection-card">
+                  <strong>Objection:</strong>
+                  <p><%= obj.claim %></p>
+                  <small>Defend with: <%= obj.refs %></small>
+                </div>
+              <% }) %>
+            </div>
+          <% } %>
+
+          <% if (slide.teacherNote) { %>
+            <details class="teacher-note">
+              <summary>Teacher note</summary>
+              <p><%= slide.teacherNote %></p>
+            </details>
+          <% } %>
+        </article>
+      <% }) %>
+    </div>
+
+    <div class="slide-controls">
+      <button class="btn" type="button" data-slide-prev>← Previous</button>
+      <span data-slide-count>1 / <%= lesson.slides.length %></span>
+      <button class="btn primary" type="button" data-slide-next>Next →</button>
+    </div>
+  </div>
+</section>
+
+<section class="panel">
+  <h2>📖 KJV Scripture Anchors</h2>
+  <% lesson.scripture.forEach(s => { %>
+    <div class="scripture">
+      <strong><%= s.ref %></strong>
+      <p><%= s.text %></p>
+    </div>
+  <% }) %>
+</section>
+
+<section class="panel">
+  <h2>✍️ Workbook Response</h2>
+  <% lesson.workbook.forEach((q, idx) => { %>
+    <label class="workbook">
+      <span><%= idx + 1 %>. <%= q %></span>
+      <textarea data-save="lesson<%= lesson.id %>-q<%= idx %>" placeholder="Write your answer here using KJV scripture..."></textarea>
+    </label>
+  <% }) %>
+</section>
+
+<section class="panel challenge-box">
+  <h2>⚔️ Challenge Training</h2>
+  <p><strong>Objection:</strong> <%= lesson.challenge.objection %></p>
+  <p><%= lesson.challenge.hint %></p>
+  <textarea data-save="lesson<%= lesson.id %>-challenge" placeholder="Respond using KJV scripture + explanation..."></textarea>
+  <button class="btn primary" onclick="completeModule('lesson-<%= lesson.id %>')">Mark Lesson Complete</button>
+</section>
+
+<section class="panel">
+  <h2>➡️ Next Step</h2>
+  <div style="display:flex; gap:12px; flex-wrap:wrap;">
+    <% if (lesson.id > 1) { %><a class="btn" href="/lesson/<%= lesson.id - 1 %>">← Previous</a><% } %>
+    <% if (lesson.id < 6) { %><a class="btn primary" href="/lesson/<%= lesson.id + 1 %>">Next →</a><% } %>
+    <a class="btn" href="/lessons">All Lessons</a>
+  </div>
+</section>

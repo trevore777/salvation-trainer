@@ -1,0 +1,22 @@
+<section class="panel">
+  <h1>Video Lessons</h1>
+  <p class="lead">These videos load from <code>public/videos</code>.</p>
+</section>
+
+<section class="grid">
+  <% lessons.forEach(l => { %>
+    <article class="card">
+      <p class="eyebrow">Lesson <%= l.id %></p>
+      <h2><%= l.title %></h2>
+
+      <video controls width="100%" preload="metadata" style="border-radius:16px; margin:16px 0;">
+        <source src="<%= l.videoPlaceholder %>" type="video/mp4">
+        Your browser does not support the video tag.
+      </video>
+
+      <p><code><%= l.videoPlaceholder %></code></p>
+
+      <a class="btn" href="/lesson/<%= l.id %>">Open Lesson</a>
+    </article>
+  <% }) %>
+</section>

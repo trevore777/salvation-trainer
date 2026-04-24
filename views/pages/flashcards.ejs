@@ -1,0 +1,21 @@
+<section class="panel">
+  <h1>Flashcards</h1>
+  <p class="lead">Click a card to flip it. Use these for quick revision and scripture defence training.</p>
+</section>
+
+<section class="flash-grid">
+  <% flashcards.forEach((card, idx) => { %>
+    <article class="flashcard" onclick="this.classList.toggle('flipped')">
+      <div class="flash-inner">
+        <div class="flash-front">
+          <p class="eyebrow"><%= card.topic %></p>
+          <h2><%= card.front %></h2>
+        </div>
+        <div class="flash-back">
+          <p><%= card.back %></p>
+          <button class="btn small" onclick="event.stopPropagation(); markFlashcard(<%= idx %>)">Mark Known</button>
+        </div>
+      </div>
+    </article>
+  <% }) %>
+</section>

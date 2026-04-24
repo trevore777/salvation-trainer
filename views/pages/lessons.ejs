@@ -1,0 +1,15 @@
+<section class="panel">
+  <h1>Lesson Pathway</h1>
+  <p class="lead">Complete the Foundation Module first. The browser will remember completed modules on this device.</p>
+</section>
+
+<section class="lesson-list">
+  <% lessons.forEach(l => { %>
+    <article class="card lesson-card" data-lesson-id="<%= l.id %>">
+      <p class="eyebrow">Lesson <%= l.id %></p>
+      <h2><%= l.title %></h2>
+      <p><%= l.bigIdea %></p>
+      <a class="btn" href="/lesson/<%= l.id %>">Open Lesson</a>
+    </article>
+  <% }) %>
+</section>

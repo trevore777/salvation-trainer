@@ -1,0 +1,21 @@
+<section class="panel">
+  <h1>Challenge Training</h1>
+  <p class="lead">One student raises an objection. Another student must answer from the KJV and explain clearly.</p>
+</section>
+
+<section class="challenge-list">
+  <% challenges.forEach((c, idx) => { %>
+    <article class="card">
+      <p class="eyebrow"><%= c.topic %></p>
+      <h2><%= c.objection %></h2>
+      <details>
+        <summary>Suggested defence</summary>
+        <p><%= c.response %></p>
+      </details>
+      <label class="workbook">
+        <span>Student response</span>
+        <textarea data-save="challenge-<%= idx %>" placeholder="Scripture + explanation..."></textarea>
+      </label>
+    </article>
+  <% }) %>
+</section>
