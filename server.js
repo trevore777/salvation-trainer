@@ -44,6 +44,10 @@ app.get("/flashcards", (req, res) => {
   res.render("pages/flashcards", { title: "Flashcards", flashcards });
 });
 
+app.get("/essay", (req, res) => {
+  res.render("pages/essay", { title: "Essay Scaffold" });
+});
+
 app.get("/challenge", (req, res) => {
   res.render("pages/challenge", { title: "Challenge Training", challenges });
 });
