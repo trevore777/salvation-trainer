@@ -1,0 +1,277 @@
+<div class="reflection-page">
+
+  <h1>Student Reflection</h1>
+
+  <p class="intro">
+    This page creates a reflection using the answers you have already written in the lessons.
+  </p>
+
+  <label for="topic">Presentation Topic</label>
+  <input
+    type="text"
+    id="topic"
+    placeholder="Example: Salvation, repentance, baptism, the Word of God"
+  >
+
+  <label for="lessonNotesPreview">Lesson Notes Found</label>
+  <textarea
+    id="lessonNotesPreview"
+    readonly
+    placeholder="Your saved lesson answers will appear here if they have been saved in this browser."
+  ></textarea>
+
+  <button type="button" class="secondary" id="loadLessonNotesBtn">
+    Load My Lesson Notes
+  </button>
+
+  <button type="button" class="secondary" id="generateBtn">
+    Use My Lesson Notes to Help Me Reflect
+  </button>
+
+  <div class="note">
+    This tool creates a draft reflection only. You should edit it and make it your own work.
+  </div>
+
+  <label for="reflectionNotes">My Reflection</label>
+  <textarea
+    id="reflectionNotes"
+    placeholder="Your reflection will appear here..."
+  ></textarea>
+
+  <button type="button" class="primary" id="saveBtn">
+    Save Reflection
+  </button>
+
+</div>
+
+<style>
+.reflection-page {
+  max-width: 900px;
+  margin: 30px auto;
+  background: #ffffff;
+  color: #222;
+  padding: 32px;
+  border-radius: 14px;
+  box-shadow: 0 0 18px rgba(0,0,0,0.08);
+}
+
+.reflection-page h1 {
+  color: #1f4e79;
+  margin-bottom: 16px;
+}
+
+.reflection-page .intro {
+  color: #333;
+  font-size: 1rem;
+}
+
+.reflection-page label {
+  display: block;
+  margin-top: 22px;
+  margin-bottom: 8px;
+  color: #1f4e79;
+  font-weight: bold;
+}
+
+.reflection-page input,
+.reflection-page textarea {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #bbb;
+  border-radius: 6px;
+  box-sizing: border-box;
+  background: #ffffff;
+  color: #111111;
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+.reflection-page textarea {
+  min-height: 170px;
+  resize: vertical;
+}
+
+#lessonNotesPreview {
+  min-height: 220px;
+  background: #f8fafc;
+}
+
+.reflection-page button {
+  margin-top: 18px;
+  margin-right: 10px;
+  padding: 12px 18px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.reflection-page .primary {
+  background: #2579c5;
+  color: #ffffff;
+}
+
+.reflection-page .secondary {
+  background: #eef3f8;
+  color: #1f4e79;
+}
+
+.reflection-page .note {
+  background: #fff8e7;
+  color: #333;
+  padding: 12px;
+  border-left: 4px solid #ffb347;
+  margin-top: 18px;
+  font-size: 0.95em;
+}
+</style>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  const topicInput = document.getElementById("topic");
+  const lessonNotesPreview = document.getElementById("lessonNotesPreview");
+  const reflectionInput = document.getElementById("reflectionNotes");
+  const loadLessonNotesBtn = document.getElementById("loadLessonNotesBtn");
+  const generateBtn = document.getElementById("generateBtn");
+  const saveBtn = document.getElementById("saveBtn");
+
+  loadSavedReflection();
+
+  loadLessonNotesBtn.addEventListener("click", function () {
+    const notes = collectLessonAnswers();
+    lessonNotesPreview.value = notes || "No saved lesson answers were found in this browser.";
+  });
+
+  generateBtn.addEventListener("click", function () {
+    let notes = lessonNotesPreview.value.trim();
+
+    if (!notes || notes === "No saved lesson answers were found in this browser.") {
+      notes = collectLessonAnswers();
+      lessonNotesPreview.value = notes || "";
+    }
+
+    if (!notes) {
+      alert("No saved lesson answers were found. Complete some lesson questions first, then return to Reflection.");
+      return;
+    }
+
+    const topic = topicInput.value.trim() || "my presentation";
+
+    const cleanedNotes = notes
+      .split(/\n+/)
+      .map(line => line.trim())
+      .filter(line =>
+        line.length > 0 &&
+        !line.toLowerCase().includes("write your answer here")
+      )
+      .slice(0, 10)
+      .join(" ");
+
+    const reflection =
+`My presentation topic was "${topic}".
+
+From the lesson work I completed, I learned that ${cleanedNotes}.
+
+These notes helped me understand the topic more clearly because I had to think about the scriptures, explain them in my own words, and connect them to the lesson.
+
+One thing I did well was recording key ideas from the workbook and using them to build my understanding.
+
+One thing I could improve next time is adding more detail, using more scripture evidence, and practising how I explain my ideas out loud.
+
+Next time, I would organise my notes earlier, complete more of the workbook questions, and make sure I can explain the topic clearly in my own words.`;
+
+    reflectionInput.value = reflection;
+    saveReflection();
+  });
+
+  saveBtn.addEventListener("click", function () {
+    saveReflection();
+    alert("Reflection saved on this browser.");
+  });
+
+  function collectLessonAnswers() {
+    let collected = [];
+
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      const value = localStorage.getItem(key);
+
+      if (!value) continue;
+
+      const keyLower = key.toLowerCase();
+
+      const likelyLessonKey =
+        keyLower.includes("lesson") ||
+        keyLower.includes("answer") ||
+        keyLower.includes("workbook") ||
+        keyLower.includes("salvation") ||
+        keyLower.includes("foundation") ||
+        keyLower.includes("student");
+
+      if (!likelyLessonKey) continue;
+
+      const extracted = extractText(value);
+
+      if (extracted.trim().length > 10) {
+        collected.push(`From ${key}:\n${extracted}`);
+      }
+    }
+
+    return collected.join("\n\n").trim();
+  }
+
+  function extractText(value) {
+    try {
+      const parsed = JSON.parse(value);
+      return flattenObject(parsed);
+    } catch {
+      return value;
+    }
+  }
+
+  function flattenObject(data) {
+    let output = [];
+
+    function walk(item) {
+      if (typeof item === "string") {
+        if (item.trim().length > 0) output.push(item.trim());
+      } else if (typeof item === "number") {
+        output.push(String(item));
+      } else if (Array.isArray(item)) {
+        item.forEach(walk);
+      } else if (item && typeof item === "object") {
+        Object.values(item).forEach(walk);
+      }
+    }
+
+    walk(data);
+    return output.join("\n");
+  }
+
+  function saveReflection() {
+    const data = {
+      topic: topicInput.value,
+      lessonNotes: lessonNotesPreview.value,
+      reflectionNotes: reflectionInput.value,
+      savedAt: new Date().toISOString()
+    };
+
+    localStorage.setItem("studentReflection", JSON.stringify(data));
+  }
+
+  function loadSavedReflection() {
+    const saved = localStorage.getItem("studentReflection");
+
+    if (!saved) return;
+
+    try {
+      const data = JSON.parse(saved);
+      topicInput.value = data.topic || "";
+      lessonNotesPreview.value = data.lessonNotes || "";
+      reflectionInput.value = data.reflectionNotes || "";
+    } catch (error) {
+      console.error("Could not load saved reflection:", error);
+    }
+  }
+});
+</script>

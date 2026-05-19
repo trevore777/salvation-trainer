@@ -56,6 +56,13 @@ app.get("/videos", (req, res) => {
   res.render("pages/videos", { title: "Video Lessons", lessons });
 });
 
+app.get("/reflection", (req, res) => {
+  res.render("pages/student-reflection", {
+    title: "Student Reflection"
+  });
+});
+
+
 app.get("/api/lessons", (req, res) => res.json(lessons));
 app.get("/api/foundation", (req, res) => res.json(foundation));
 app.get("/api/flashcards", (req, res) => res.json(flashcards));
