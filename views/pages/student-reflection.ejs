@@ -32,15 +32,32 @@
     This tool creates a draft reflection only. You should edit it and make it your own work.
   </div>
 
-  <label for="reflectionNotes">My Reflection</label>
-  <textarea
-    id="reflectionNotes"
-    placeholder="Your reflection will appear here..."
-  ></textarea>
+  <section class="panel" id="reflectionPrintArea">
+    <h2>My Reflection</h2>
 
-  <button type="button" class="primary" id="saveBtn">
-    Save Reflection
-  </button>
+    <textarea
+      id="reflectionNotes"
+      placeholder="Your reflection will appear here..."
+    ></textarea>
+  </section>
+
+  <section class="panel">
+    <h2>📄 Submit Reflection</h2>
+
+    <label class="workbook">
+      <span>Student Full Name</span>
+      <input
+        type="text"
+        id="studentFullName"
+        placeholder="e.g. John Smith"
+        style="width:100%;padding:12px;border-radius:12px;margin-top:8px;"
+      >
+    </label>
+
+    <button class="btn primary" onclick="saveReflectionPDF()">
+      Submit Reflection as PDF
+    </button>
+  </section>
 
 </div>
 
@@ -55,9 +72,9 @@
   box-shadow: 0 0 18px rgba(0,0,0,0.08);
 }
 
-.reflection-page h1 {
+.reflection-page h1,
+.reflection-page h2 {
   color: #1f4e79;
-  margin-bottom: 16px;
 }
 
 .reflection-page .intro {
@@ -89,6 +106,10 @@
 .reflection-page textarea {
   min-height: 170px;
   resize: vertical;
+}
+
+#reflectionNotes {
+  min-height: 350px;
 }
 
 #lessonNotesPreview {
@@ -124,6 +145,10 @@
   margin-top: 18px;
   font-size: 0.95em;
 }
+
+.reflection-page .panel {
+  margin-top: 28px;
+}
 </style>
 
 <script>
@@ -133,7 +158,6 @@ document.addEventListener("DOMContentLoaded", function () {
   const reflectionInput = document.getElementById("reflectionNotes");
   const loadLessonNotesBtn = document.getElementById("loadLessonNotesBtn");
   const generateBtn = document.getElementById("generateBtn");
-  const saveBtn = document.getElementById("saveBtn");
 
   loadSavedReflection();
 
@@ -184,10 +208,9 @@ Next time, I would organise my notes earlier, complete more of the workbook ques
     saveReflection();
   });
 
-  saveBtn.addEventListener("click", function () {
-    saveReflection();
-    alert("Reflection saved on this browser.");
-  });
+  reflectionInput.addEventListener("input", saveReflection);
+  topicInput.addEventListener("input", saveReflection);
+  lessonNotesPreview.addEventListener("input", saveReflection);
 
   function collectLessonAnswers() {
     let collected = [];
@@ -261,7 +284,6 @@ Next time, I would organise my notes earlier, complete more of the workbook ques
 
   function loadSavedReflection() {
     const saved = localStorage.getItem("studentReflection");
-
     if (!saved) return;
 
     try {
@@ -274,4 +296,79 @@ Next time, I would organise my notes earlier, complete more of the workbook ques
     }
   }
 });
+
+function buildFileName(fullName) {
+  const cleaned = fullName.trim();
+  if (!cleaned) return "reflection.pdf";
+  return cleaned.replace(/\s+/g, "_") + ".pdf";
+}
+
+function escapeHTML(text) {
+  return text
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
+}
+
+function saveReflectionPDF() {
+  const studentName = document.getElementById("studentFullName").value.trim();
+  const reflectionText = document.getElementById("reflectionNotes").value.trim();
+
+  if (!studentName) {
+    alert("Please enter your full name.");
+    return;
+  }
+
+  if (!reflectionText) {
+    alert("Please write your reflection first.");
+    return;
+  }
+
+  const fileName = buildFileName(studentName);
+  const printWindow = window.open("", "_blank");
+
+  printWindow.document.write(`
+    <!doctype html>
+    <html>
+      <head>
+        <title>${fileName}</title>
+        <style>
+          body {
+            font-family: Arial, sans-serif;
+            padding: 40px;
+            color: black;
+            line-height: 1.6;
+          }
+
+          h1 {
+            font-size: 24px;
+            margin-bottom: 10px;
+          }
+
+          .name {
+            font-size: 14px;
+            margin-bottom: 30px;
+          }
+
+          .reflection {
+            white-space: pre-wrap;
+            font-size: 16px;
+          }
+        </style>
+      </head>
+      <body>
+        <h1>My Reflection</h1>
+        <div class="name"><strong>Student:</strong> ${escapeHTML(studentName)}</div>
+        <div class="reflection">${escapeHTML(reflectionText)}</div>
+      </body>
+    </html>
+  `);
+
+  printWindow.document.close();
+  printWindow.focus();
+
+  setTimeout(() => {
+    printWindow.print();
+  }, 300);
+}
 </script>
